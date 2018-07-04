@@ -1,12 +1,22 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
-	"io/ioutil"
 	"github.com/PuerkitoBio/goquery"
+	"net/http"
 	"log"
+	"fmt"
+	"io"
 )
+
+//
+//import (
+//	"fmt"
+//	"net/http"
+//	"io/ioutil"
+//	"github.com/PuerkitoBio/goquery"
+//	"log"
+//	"strings"
+//)
 
 // -------------------------------------
 
@@ -70,7 +80,7 @@ const (
 
 // -------------------------------------
 
-func fetchUrl(url string) ([]byte, *goquery.Document) {
+func fetchUrl(url string) (*goquery.Document, *goquery.Document) {
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -78,7 +88,7 @@ func fetchUrl(url string) ([]byte, *goquery.Document) {
 	}
 
 	defer resp.Body.Close()
-	html, err := ioutil.ReadAll(resp.Body)
+	html, err := goquery.NewDocumentFromReader(io.Reader(resp.Body))
 	if err != nil {
 		panic(err)
 	}
@@ -91,11 +101,17 @@ func fetchUrl(url string) ([]byte, *goquery.Document) {
 	return html, text
 }
 
-func articles(text goquery.Document) {
-	text.Find("div.offers.list").Each(func(i int, s *goquery.Selection) {
-		article := s.Text()
-		fmt.Printf("%s\n", article)
-	})
+func processElement(article_list *goquery.Selection) {
+	href, present := article_list.Attr("href")
+	if present {
+		fmt.Println(href)
+	}
+}
+
+func articles(html goquery.Document) {
+
+	article_list := html.Find(".offers.list")
+	processElement(article_list)
 }
 
 func main() {
@@ -105,9 +121,37 @@ func main() {
 
 	fmt.Printf("HTML code of %s", completeUrl)
 
-	_, text := fetchUrl(completeUrl)
-	articles(*text)
+	html, _ := fetchUrl(completeUrl)
+	articles(*html)
 
 	//fmt.Printf("%s", html)
 
 }
+//
+//const html = `
+//<div class="container">
+//    <div class="row">
+//      <div class="col-lg-8">
+//        <p align="justify"><b>Name</b>Priyaka</p>
+//        <p align="justify"><b>Surname</b>Patil</p>
+//        <p align="justify"><b>Adress</b><br>India,Kolhapur</p>
+//        <p align="justify"><b>Hobbies&nbsp;</b><br>Playing</p>
+//        <p align="justify"><b>Eduction</b><br>12th</p>
+//        <p align="justify"><b>School</b><br>New Highschool</p>
+//       </div>
+//    </div>
+//</div>
+//`
+//
+//func main() {
+//	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	doc.Find(".container").Find("[align=\"justify\"]").Each(func(_ int, s *goquery.Selection) {
+//		prefix := s.Find("b").Text()
+//		result := strings.TrimPrefix(s.Text(), prefix)
+//		println(result)
+//	})
+//}
