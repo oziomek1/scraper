@@ -158,13 +158,16 @@ func parse(url string) (*html.Node, error) {
 	return body, err
 }
 
-
-
 func getLinks(page *html.Node, links []string) ([]string) {
+	var b html.Attribute
 	for _, a := range page.Attr {
 		if a.Key == "data-href" {
 			links = append(links, a.Val)
 		}
+		if a.Key == "rel" && a.Val == "next" && b.Val != "" {
+			fmt.Printf("Next page %s\n",  b.Val)
+		}
+		b = a
 	}
 	for c := page.FirstChild; c != nil; c = c.NextSibling {
 		links = getLinks(c, links)
