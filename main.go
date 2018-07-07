@@ -158,46 +158,18 @@ func parse(url string) (*html.Node, error) {
 	return body, err
 }
 
-func crawl(links []string, page *html.Node) ([]string) {
-	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		links = crawl(links, page)
-		for _, a := range page.Attr {
-			fmt.Println(a.Key, a.Val)
-			if a.Key == "data-href" {
-				fmt.Println(a.Val)
-				links = append(links, a.Val)
-			}
-		}
-		fmt.Println(links)
-	}
-	return links
-}
 
-func getLinks(links []string, page *html.Node) ([]string) {
-	if page.Type == html.ElementNode {
-		links = crawl(links, page)
-	}
-	return links
-}
 
-func pageTitle(page *html.Node) (string) {
-	var title string
-	if page.Type == html.ElementNode && page.Data == "title" {
-		//fmt.Println(page.FirstChild.Data)
-	}
+func getLinks(page *html.Node, links []string) ([]string) {
 	for _, a := range page.Attr {
-		//fmt.Println(a.Key, a.Val)
 		if a.Key == "data-href" {
-			fmt.Println(a.Val)
+			links = append(links, a.Val)
 		}
 	}
 	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		title = pageTitle(c)
-		if title != "" {
-			break
-		}
+		links = getLinks(c, links)
 	}
-	return title
+	return links
 }
 
 func main() {
@@ -224,13 +196,11 @@ func main() {
 		fmt.Printf("Error with %s %s", completeUrl, err)
 		return
 	}
-
-	fmt.Println(pageTitle(page))
-
 	var links []string
-	links = getLinks(links, page)
-
-	fmt.Printf("LINKI %s\n", links)
+	links = getLinks(page, links)
+	for index, link := range links {
+		fmt.Println(index, "->", link)
+	}
 
 	element, ok := getElementById("class", "offers list", page)
 
