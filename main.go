@@ -1,11 +1,10 @@
 package main
 
 import (
-	"github.com/PuerkitoBio/goquery"
 	"net/http"
-	"log"
 	"fmt"
-	"io"
+
+	"golang.org/x/net/html"
 )
 
 //
@@ -80,38 +79,125 @@ const (
 
 // -------------------------------------
 
-func fetchUrl(url string) (*goquery.Document, *goquery.Document) {
+//func fetchUrl(url string) (*goquery.Document, *goquery.Document, *http.Response) {
+//
+//	resp, err := http.Get(url)
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	defer resp.Body.Close()
+//	html, err := goquery.NewDocumentFromReader(io.Reader(resp.Body))
+//	if err != nil {
+//		panic(err)
+//	}
+//
+//	text, err := goquery.NewDocument(url)
+//	if err != nil {
+//		log.Fatal(err)
+//	}
+//
+//	return html, text, resp
+//}
+//
+//func processElement(article_list *goquery.Selection) {
+//	href, present := article_list.Attr("href")
+//	if present {
+//		fmt.Println(href)
+//	}
+//}
 
+//func articles(html goquery.Document) {
+//
+//	article_list := html.Find(".offers.list")
+//	processElement(article_list)
+//}
+
+// -------------------------------------
+
+// Example usage:
+// <input tag="my_id_name" value="input_value"/>
+// tag = "tag"
+// id = "my_id_name"
+// getElementById("tag", "my_id_name", pageNode)
+// -------------------------------------
+
+func getElementById(tag string, id string, n* html.Node) (element *html.Node, ok bool) {
+	for _, a := range n.Attr {
+		if a.Key == tag && a.Val == id {
+			return n, true
+		}
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling{
+		if element, ok = getElementById(tag, id, c); ok {
+			return
+		}
+	}
+	return
+}
+
+func getOffersList(page *html.Node) string {
+	var offersList string
+	if page.Type == html.ElementNode && page.Data == "div" {
+		fmt.Println(offersList)
+	}
+	return offersList
+}
+
+func parse(url string) (*html.Node, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("cannot get page")
 	}
 
-	defer resp.Body.Close()
-	html, err := goquery.NewDocumentFromReader(io.Reader(resp.Body))
+	body, err := html.Parse(resp.Body)
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("cannot parse page")
 	}
 
-	text, err := goquery.NewDocument(url)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return html, text
+	return body, err
 }
 
-func processElement(article_list *goquery.Selection) {
-	href, present := article_list.Attr("href")
-	if present {
-		fmt.Println(href)
+func crawl(links []string, page *html.Node) ([]string) {
+	for c := page.FirstChild; c != nil; c = c.NextSibling {
+		links = crawl(links, page)
+		for _, a := range page.Attr {
+			fmt.Println(a.Key, a.Val)
+			if a.Key == "data-href" {
+				fmt.Println(a.Val)
+				links = append(links, a.Val)
+			}
+		}
+		fmt.Println(links)
 	}
+	return links
 }
 
-func articles(html goquery.Document) {
+func getLinks(links []string, page *html.Node) ([]string) {
+	if page.Type == html.ElementNode {
+		links = crawl(links, page)
+	}
+	return links
+}
 
-	article_list := html.Find(".offers.list")
-	processElement(article_list)
+func pageTitle(page *html.Node) (string) {
+	var title string
+	if page.Type == html.ElementNode && page.Data == "title" {
+		//fmt.Println(page.FirstChild.Data)
+	}
+	for _, a := range page.Attr {
+		//fmt.Println(a.Key, a.Val)
+		if a.Key == "data-href" {
+			fmt.Println(a.Val)
+		}
+	}
+	for c := page.FirstChild; c != nil; c = c.NextSibling {
+		title = pageTitle(c)
+		if title != "" {
+			break
+		}
+	}
+	return title
 }
 
 func main() {
@@ -119,39 +205,41 @@ func main() {
 	make, model := "volkswagen/", "golf/"
 	completeUrl := BASE_URL + passenger + make + model
 
-	fmt.Printf("HTML code of %s", completeUrl)
+	fmt.Println(completeUrl)
 
-	html, _ := fetchUrl(completeUrl)
-	articles(*html)
-
+	//_, _, resp := fetchUrl(completeUrl)
+	//articles(*html)
+	//
+	//resp, err := http.Get(completeUrl)
+	//if err != nil {
+	//	return
+	//}
+	//defer resp.Body.Close()
+	//body, _ := ioutil.ReadAll(resp.Body)
+	//fmt.Println(string(body))
 	//fmt.Printf("%s", html)
 
+	page, err := parse(completeUrl)
+	if err != nil {
+		fmt.Printf("Error with %s %s", completeUrl, err)
+		return
+	}
+
+	fmt.Println(pageTitle(page))
+
+	var links []string
+	links = getLinks(links, page)
+
+	fmt.Printf("LINKI %s\n", links)
+
+	element, ok := getElementById("class", "offers list", page)
+
+	if !ok {
+		fmt.Errorf("error finding element")
+	} else {
+		for _, a := range element.Attr {
+			fmt.Println(a.Key, a.Val)
+		}
+	}
+
 }
-//
-//const html = `
-//<div class="container">
-//    <div class="row">
-//      <div class="col-lg-8">
-//        <p align="justify"><b>Name</b>Priyaka</p>
-//        <p align="justify"><b>Surname</b>Patil</p>
-//        <p align="justify"><b>Adress</b><br>India,Kolhapur</p>
-//        <p align="justify"><b>Hobbies&nbsp;</b><br>Playing</p>
-//        <p align="justify"><b>Eduction</b><br>12th</p>
-//        <p align="justify"><b>School</b><br>New Highschool</p>
-//       </div>
-//    </div>
-//</div>
-//`
-//
-//func main() {
-//	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	doc.Find(".container").Find("[align=\"justify\"]").Each(func(_ int, s *goquery.Selection) {
-//		prefix := s.Find("b").Text()
-//		result := strings.TrimPrefix(s.Text(), prefix)
-//		println(result)
-//	})
-//}
