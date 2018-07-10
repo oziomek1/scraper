@@ -1,12 +1,12 @@
 package main
 
 import (
-	"net/http"
 	"fmt"
 
 	"golang.org/x/net/html"
 )
-
+// -------------------------------------
+// Imports for using goquery framework
 //
 //import (
 //	"fmt"
@@ -76,52 +76,17 @@ const (
 	YEAR_SINCE = "od-"
 	YEAR_TO = "search%5Bfilter_float_year%3Ato%5D="
 )
-
 // -------------------------------------
 
-//func fetchUrl(url string) (*goquery.Document, *goquery.Document, *http.Response) {
-//
-//	resp, err := http.Get(url)
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	defer resp.Body.Close()
-//	html, err := goquery.NewDocumentFromReader(io.Reader(resp.Body))
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	text, err := goquery.NewDocument(url)
-//	if err != nil {
-//		log.Fatal(err)
-//	}
-//
-//	return html, text, resp
-//}
-//
-//func processElement(article_list *goquery.Selection) {
-//	href, present := article_list.Attr("href")
-//	if present {
-//		fmt.Println(href)
-//	}
-//}
 
-//func articles(html goquery.Document) {
-//
-//	article_list := html.Find(".offers.list")
-//	processElement(article_list)
-//}
 
 // -------------------------------------
-
 // Example usage:
 // <input tag="my_id_name" value="input_value"/>
 // tag = "tag"
 // id = "my_id_name"
 // getElementById("tag", "my_id_name", pageNode)
 // -------------------------------------
-
 func getElementById(tag string, id string, n* html.Node) (element *html.Node, ok bool) {
 	for _, a := range n.Attr {
 		if a.Key == tag && a.Val == id {
@@ -144,35 +109,38 @@ func getOffersList(page *html.Node) string {
 	return offersList
 }
 
-func parse(url string) (*html.Node, error) {
-	resp, err := http.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("cannot get page")
-	}
-
-	body, err := html.Parse(resp.Body)
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse page")
-	}
-
-	return body, err
-}
-
-func getLinks(page *html.Node, links []string) ([]string) {
-	var b html.Attribute
+// -------------------------------------
+// Get links within particular xml node
+// -------------------------------------
+func getLinks(tag string, page *html.Node, links []string) ([]string) {
 	for _, a := range page.Attr {
-		if a.Key == "data-href" {
+		if a.Key == tag {
 			links = append(links, a.Val)
 		}
+	}
+	for c := page.FirstChild; c != nil; c = c.NextSibling {
+		links = getLinks(tag, c, links)
+	}
+	return links
+}
+
+// -------------------------------------
+// Get next page link
+// -------------------------------------
+func nextPageLink(page *html.Node) (string) {
+	var b html.Attribute
+	var nextPage string
+	for _, a := range page.Attr {
 		if a.Key == "rel" && a.Val == "next" && b.Val != "" {
-			fmt.Printf("Next page %s\n",  b.Val)
+			nextPage = b.Val
+			return nextPage
 		}
 		b = a
 	}
 	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		links = getLinks(c, links)
+		nextPage = nextPageLink(c)
 	}
-	return links
+	return nextPage
 }
 
 func main() {
@@ -182,30 +150,14 @@ func main() {
 
 	fmt.Println(completeUrl)
 
-	//_, _, resp := fetchUrl(completeUrl)
-	//articles(*html)
-	//
-	//resp, err := http.Get(completeUrl)
-	//if err != nil {
-	//	return
-	//}
-	//defer resp.Body.Close()
-	//body, _ := ioutil.ReadAll(resp.Body)
-	//fmt.Println(string(body))
-	//fmt.Printf("%s", html)
-
 	page, err := parse(completeUrl)
 	if err != nil {
 		fmt.Printf("Error with %s %s", completeUrl, err)
 		return
 	}
-	var links []string
-	links = getLinks(page, links)
-	for index, link := range links {
-		fmt.Println(index, "->", link)
-	}
-
 	element, ok := getElementById("class", "offers list", page)
+
+	fmt.Println("Page title: ", pageTitle(page))
 
 	if !ok {
 		fmt.Errorf("error finding element")
@@ -214,5 +166,13 @@ func main() {
 			fmt.Println(a.Key, a.Val)
 		}
 	}
+
+	var links []string
+	nextPage := nextPageLink(page)
+	fmt.Println(nextPage)
+	tagWithLink := "data-href"
+	links = getLinks(tagWithLink, page, links)
+
+	urlCrawl(links)
 
 }
