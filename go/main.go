@@ -5,8 +5,9 @@ import (
 
 	"golang.org/x/net/html"
 )
+
 // -------------------------------------
-// Imports for using goquery framework
+// Imports if using goquery framework
 //
 //import (
 //	"fmt"
@@ -109,70 +110,17 @@ func getOffersList(page *html.Node) string {
 	return offersList
 }
 
-// -------------------------------------
-// Get links within particular xml node
-// -------------------------------------
-func getLinks(tag string, page *html.Node, links []string) ([]string) {
-	for _, a := range page.Attr {
-		if a.Key == tag {
-			links = append(links, a.Val)
-		}
-	}
-	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		links = getLinks(tag, c, links)
-	}
-	return links
-}
-
-// -------------------------------------
-// Get next page link
-// -------------------------------------
-func nextPageLink(page *html.Node) (string) {
-	var b html.Attribute
-	var nextPage string
-	for _, a := range page.Attr {
-		if a.Key == "rel" && a.Val == "next" && b.Val != "" {
-			nextPage = b.Val
-			return nextPage
-		}
-		b = a
-	}
-	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		nextPage = nextPageLink(c)
-	}
-	return nextPage
-}
 
 func main() {
+
+	var pageData []PageData
 
 	make, model := "volkswagen/", "golf/"
 	completeUrl := BASE_URL + passenger + make + model
 
-	fmt.Println(completeUrl)
+	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n\n\n")
 
-	page, err := parse(completeUrl)
-	if err != nil {
-		fmt.Printf("Error with %s %s", completeUrl, err)
-		return
-	}
-	element, ok := getElementById("class", "offers list", page)
-
-	fmt.Println("Page title: ", pageTitle(page))
-
-	if !ok {
-		fmt.Errorf("error finding element")
-	} else {
-		for _, a := range element.Attr {
-			fmt.Println(a.Key, a.Val)
-		}
-	}
-
-	var links []string
-	nextPage := nextPageLink(page)
-	fmt.Println(nextPage)
-	tagWithLink := "data-href"
-	links = getLinks(tagWithLink, page, links)
-
-	urlCrawl(links)
+	tagForLink := "data-href"
+	urlLinkCrawl(tagForLink, completeUrl, pageData, 0)
 
 }
