@@ -84,7 +84,9 @@ func getAndShowLinks(htmlTag string, page *html.Node, iteration int) (links[] st
 func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 	nextPageUrl = nextPageLink(page)
 
-	fmt.Println("Link to the next page:", nextPageUrl)
+	if nextPageUrl != "" {
+		fmt.Println("Link to the next page:", nextPageUrl)
+	}
 	return nextPageUrl
 }
 
@@ -97,14 +99,15 @@ func urlLinkCrawl(htmlTag string, url string, pageData []PageData, iteration int
 		fmt.Printf("Error with %s %s", pageContent, err)
 		return
 	}
-	fmt.Println("Current page title: ", pageTitle(pageContent))
+	fmt.Println("\nCurrent page title: ", pageTitle(pageContent))
 
 	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration), getAndShowNextPageUrl(pageContent)}
 	pageData = append(pageData, currentData)
-	fmt.Println(len(pageData))
 
 	if currentData.nextPageUrl != "" {
 		iteration += 1
 		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, iteration)
+	} else {
+		fmt.Println("The end of offers")
 	}
 }
