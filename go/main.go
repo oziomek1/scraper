@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"golang.org/x/net/html"
+	"runtime"
 )
 
 // -------------------------------------
@@ -112,6 +113,10 @@ func getOffersList(page *html.Node) string {
 
 
 func main() {
+	// ---------------------------------
+	// Define max number of goroutines (lightweight threads)
+	// ---------------------------------
+	runtime.GOMAXPROCS(5)
 
 	var pageData []PageData
 
