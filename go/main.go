@@ -69,14 +69,21 @@ const (
 	//----------------------------------
 	// ENGINE_CAPACITY
 
-	from = "search%5Bfilter_float_engine_capacity%3Afrom%5D="
-	to = "search%5Bfilter_float_engine_capacity%3Ato%5D="
+	engine_from = "search%5Bfilter_float_engine_capacity%3Afrom%5D="
+	engine_to = "search%5Bfilter_float_engine_capacity%3Ato%5D="
 
 	//----------------------------------
 	// YEARS
 
 	YEAR_SINCE = "od-"
 	YEAR_TO = "search%5Bfilter_float_year%3Ato%5D="
+
+	//----------------------------------
+	// POWER
+
+	power_from = "search%5Bfilter_float_engine_power%3Afrom%5D="
+	power_to = "search%5Bfilter_float_engine_power%3Ato%5D="
+
 )
 // -------------------------------------
 
@@ -119,6 +126,7 @@ func main() {
 	runtime.GOMAXPROCS(5)
 
 	var pageData []PageData
+	var offers []Offer
 
 	make, model := "volkswagen/", "golf/"
 	completeUrl := BASE_URL + passenger + make + model
@@ -126,6 +134,6 @@ func main() {
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n\n\n")
 
 	tagForLink := "data-href"
-	urlLinkCrawl(tagForLink, completeUrl, pageData, 0)
+	urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
 
 }

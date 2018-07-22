@@ -27,6 +27,7 @@ type Options struct {
 }
 
 type Params struct {
+	id int
 	price, currency string
 	seller, category, make, model string
 	generation, year, mileage, engineCapacity string
@@ -37,9 +38,12 @@ type Params struct {
 }
 
 type Offer struct {
-	id uint64
 	url string
-	Params
-	Options
+	// Params
+	// Options
 }
 
+func visitOffer(link string, offers []Offer) {
+	offer := Offer{link}
+	offers = append(offers, offer)
+}

@@ -90,10 +90,16 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 	return nextPageUrl
 }
 
+func visitOffers(data PageData, offers []Offer) {
+	for _, link := range data.links {
+		go visitOffer(link, offers)
+	}
+}
+
 // -------------------------------------
 // Main loop, iterate whenever next page button exists
 // -------------------------------------
-func urlLinkCrawl(htmlTag string, url string, pageData []PageData, iteration int) {
+func urlLinkCrawl(htmlTag string, url string, pageData []PageData, offers []Offer, iteration int) {
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
 		fmt.Printf("Error with %s %s", pageContent, err)
@@ -104,9 +110,15 @@ func urlLinkCrawl(htmlTag string, url string, pageData []PageData, iteration int
 	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration), getAndShowNextPageUrl(pageContent)}
 	pageData = append(pageData, currentData)
 
+	visitOffers(currentData, offers)
+
+	for _, o := range offers {
+		fmt.Println("PRINTUJ", o.url)
+	}
+
 	if currentData.nextPageUrl != "" {
 		iteration += 1
-		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, iteration)
+		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, offers, iteration)
 	} else {
 		fmt.Println("The end of offers")
 	}
