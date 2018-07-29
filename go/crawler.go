@@ -15,59 +15,6 @@ type PageData struct {
 }
 
 // -------------------------------------
-// Get links within particular xml node
-// -------------------------------------
-func getLinks(tag string, page *html.Node, links []string) ([]string) {
-	for _, a := range page.Attr {
-		if a.Key == tag {
-			links = append(links, a.Val)
-		}
-	}
-	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		links = getLinks(tag, c, links)
-	}
-	return links
-}
-
-// -------------------------------------
-// Get page title
-// -------------------------------------
-func pageTitle(page *html.Node) (string) {
-	var title string
-	if page.Type == html.ElementNode && page.Data == "title" {
-		title = page.FirstChild.Data
-		return title
-	}
-	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		title = pageTitle(c)
-		if title != "" {
-			break
-		}
-	}
-	return title
-}
-
-// -------------------------------------
-// Get next page link (button id)
-// -------------------------------------
-func nextPageLink(page *html.Node) (nextPage string) {
-	var b html.Attribute
-	for _, a := range page.Attr {
-		if a.Key == "rel" && a.Val == "next" && b.Val != "" {
-			nextPage = b.Val
-			return nextPage
-		}
-		b = a
-	}
-	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		if nextPageLink(c) != "" {
-			nextPage = nextPageLink(c)
-		}
-	}
-	return nextPage
-}
-
-// -------------------------------------
 // Find links for offers and print them
 // -------------------------------------
 func getAndShowLinks(htmlTag string, page *html.Node, iteration int) (links[] string) {

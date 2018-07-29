@@ -48,17 +48,17 @@ const (
 	//----------------------------------
 	// QUERIES
 
-	QUERY_STRING_MARK = "?"
+	QUERY_MARK = "?"
 	QUERY_START = "search%5B"
 	QUERY_JOIN = "&"
 
 	//----------------------------------
 	// SORT_TYPE
 
-	time = "search%5Border%5D=created_at%3A"
-	price = "search%5Border%5D=filter_float_price%3A"
-	mileage = "search%5Border%5D=filter_float_mileage%3A"
-	power = "search%5Border%5D=filter_float_engine_power%3A"
+	time = "order%5D=created_at%3A"
+	price = "order%5D=filter_float_price%3A"
+	mileage = "order%5D=filter_float_mileage%3A"
+	power = "order%5D=filter_float_engine_power%3A"
 
 	//----------------------------------
 	// SORT_TYPE_MODE
@@ -69,46 +69,23 @@ const (
 	//----------------------------------
 	// ENGINE_CAPACITY
 
-	engine_from = "search%5Bfilter_float_engine_capacity%3Afrom%5D="
-	engine_to = "search%5Bfilter_float_engine_capacity%3Ato%5D="
+	engine_from = "filter_float_engine_capacity%3Afrom%5D="
+	engine_to = "filter_float_engine_capacity%3Ato%5D="
 
 	//----------------------------------
 	// YEARS
 
 	YEAR_SINCE = "od-"
-	YEAR_TO = "search%5Bfilter_float_year%3Ato%5D="
+	YEAR_TO = "filter_float_year%3Ato%5D="
 
 	//----------------------------------
 	// POWER
 
-	power_from = "search%5Bfilter_float_engine_power%3Afrom%5D="
-	power_to = "search%5Bfilter_float_engine_power%3Ato%5D="
+	power_from = "filter_float_engine_power%3Afrom%5D="
+	power_to = "filter_float_engine_power%3Ato%5D="
 
 )
 // -------------------------------------
-
-
-
-// -------------------------------------
-// Example usage:
-// <input tag="my_id_name" value="input_value"/>
-// tag = "tag"
-// id = "my_id_name"
-// getElementById("tag", "my_id_name", pageNode)
-// -------------------------------------
-func getElementById(tag string, id string, n* html.Node) (element *html.Node, ok bool) {
-	for _, a := range n.Attr {
-		if a.Key == tag && a.Val == id {
-			return n, true
-		}
-	}
-	for c := n.FirstChild; c != nil; c = c.NextSibling{
-		if element, ok = getElementById(tag, id, c); ok {
-			return
-		}
-	}
-	return
-}
 
 func getOffersList(page *html.Node) string {
 	var offersList string
@@ -125,15 +102,18 @@ func main() {
 	// ---------------------------------
 	runtime.GOMAXPROCS(5)
 
-	var pageData []PageData
-	var offers []Offer
+	// var pageData []PageData
+	// var offers []Offer
 
 	make, model := "volkswagen/", "golf/"
-	completeUrl := BASE_URL + passenger + make + model
+	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "200"
 
-	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n\n\n")
+	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
 
-	tagForLink := "data-href"
-	urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
+	// tagForLink := "data-href"
+	// urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
+
+	offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
+	readOffer(offerUrl)
 
 }

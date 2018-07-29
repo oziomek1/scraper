@@ -1,7 +1,9 @@
 package main
 
 import (
-
+	"fmt"
+	"strconv"
+	"strings"
 )
 
 type Options struct {
@@ -43,7 +45,47 @@ type Offer struct {
 	// Options
 }
 
+
+func readOffer(url string) {
+	pageContent, err := parseUrlToNode(url)
+	if err != nil {
+		fmt.Printf("Error with %s %s", pageContent, err)
+		return
+	}
+
+	// -------------------------------------
+	// Get offer ID
+	// -------------------------------------
+	offerId := getElementByTag("data-id_raw", pageContent)
+	if offerId, err := strconv.ParseInt(offerId, 10, 64); err == nil {
+		fmt.Println(offerId)
+	}
+
+	// -------------------------------------
+	// Get offer price
+	// -------------------------------------
+	price := getElementByTag("data-price", pageContent)
+	price = strings.Replace(price, " ", "", -1)
+	fmt.Println(price)
+
+	// -------------------------------------
+	// Get offer currency
+	// -------------------------------------
+	currency, _ := getElementById("class", "offer-price__currency", pageContent)
+	fmt.Println(currency.FirstChild.Data)
+
+	// -------------------------------------
+	// Get offer seller
+	// -------------------------------------
+	seller, _ := getElementById("class", "offer-params__list", pageContent)
+	fmt.Println(seller.FirstChild.NextSibling)
+
+	_, sellers, _ := getElementsById("class", "offer-params__list", pageContent, nil)
+	fmt.Println(sellers)
+}
+
 func visitOffer(link string, offers []Offer) {
+	readOffer(link)
 	offer := Offer{link}
 	offers = append(offers, offer)
 }
