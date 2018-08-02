@@ -1,0 +1,24 @@
+sudo: false
+
+language: go
+
+go:
+  - 1.9.x
+  - 1.10.x
+  - master
+
+git:
+  depth: 1
+
+install: true
+
+notifications:
+  email:
+    on_success: change
+    on_failure: always
+
+script:
+  - go get -t ./...
+  - go build
+
+services: docker
