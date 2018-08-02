@@ -19,6 +19,6 @@ notifications:
 
 script:
   - go get -t ./...
-  - go build
+  - go build -o go/main ./go/
 
 services: docker
