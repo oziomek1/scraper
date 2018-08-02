@@ -2,6 +2,7 @@ package main
 
 import (
 	"golang.org/x/net/html"
+	"strings"
 )
 
 // -------------------------------------
@@ -28,18 +29,20 @@ func getElementById(tag string, id string, n* html.Node) (element *html.Node, ok
 // -------------------------------------
 // Get elements by ID inside table
 // -------------------------------------
-func getElementsById(tag string, id string, n *html.Node, elements []string) (element *html.Node, elems []string, ok bool) {
+func getElementsById(tag string, n *html.Node, elements []string) (*html.Node, []string) {
+	var node *html.Node
 	for _, a := range n.Attr {
-		if a.Key == tag && a.Val == id {
+		if a.Key == tag && a.Val != "a" {
 			elements = append(elements, a.Val)
+			return node, elements
+		} else if a.Key == tag {
+			node, elements = getElementsById(tag, n.FirstChild, elements)
 		}
 	}
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if element, elements, ok = getElementsById(tag, id, c, elements); ok {
-			return
-		}
+		node, elements = getElementsById(tag, c, elements)
 	}
-	return
+	return node, elements
 }
 
 // -------------------------------------
@@ -132,4 +135,18 @@ func nextPageLink(page *html.Node) (nextPage string) {
 		}
 	}
 	return nextPage
+}
+
+func filterUnnecessaryChars(s string) string {
+	s = strings.Map(func(r rune) rune {
+		switch r {
+		case 0x000A, 0x000B, 0x000C, 0x000D, 0x0085, 0x2028, 0x2029:
+			return -1
+		default:
+			return r
+
+		}
+	}, s)
+	s = strings.TrimSpace(s)
+	return s
 }
