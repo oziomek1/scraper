@@ -102,18 +102,18 @@ func main() {
 	// ---------------------------------
 	runtime.GOMAXPROCS(5)
 
-	// var pageData []PageData
-	// var offers []Offer
+	var pageData []PageData
+	var offers []Offer
 
 	make, model := "volkswagen/", "golf/"
 	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "200"
 
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
 
-	// tagForLink := "data-href"
-	// urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
+	tagForLink := "data-href"
+	urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
 
-	offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
-	readOffer(offerUrl)
+	//offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
+	// readOffer(offerUrl)
 
 }

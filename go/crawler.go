@@ -41,6 +41,7 @@ func visitOffers(data PageData, offers []Offer) {
 	for _, link := range data.links {
 		go visitOffer(link, offers)
 	}
+	fmt.Println(len(offers))
 }
 
 // -------------------------------------
