@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"golang.org/x/net/html"
 )
 
 type Options struct {
@@ -45,6 +46,19 @@ type Offer struct {
 	// Options
 }
 
+var paramsList = [...]string{"Seller", "Category", "Make", "Model", "Generation"}
+
+func recursiveParams(node *html.Node, idx int) {
+	if idx >= len(paramsList) /* Seller, Category, Make, Model, Generation */ {
+		return
+	} else {
+		idx += 1
+	}
+	newNode := node.NextSibling.NextSibling
+	printNode := node.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	fmt.Println(strings.TrimSpace(strings.TrimRight(printNode, "\r\n")))
+	recursiveParams(newNode, idx)
+}
 
 func readOffer(url string) {
 	pageContent, err := parseUrlToNode(url)
@@ -81,76 +95,58 @@ func readOffer(url string) {
 	// -------------------------------------
 	offerParams, _ := getElementById("class", "offer-params", pageContent)
 
-	// ul
-	//fmt.Println(offerParams.FirstChild.NextSibling.Data)
-
-	// ul > li (1)
-	//fmt.Println(offerParams.FirstChild.NextSibling.FirstChild.NextSibling.Data)
-
-	// ul > li (2)
-	//fmt.Println(offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.Data)
-	// ul > li > span
-	//fmt.Println(offerParams.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.Data)
-
-	// ul > li > div
-	//fmt.Println(offerParams.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.Data)
-
-	// ul > li > span > value (1)
-	//fmt.Println(offerParams.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.Data)
-
-	// ul > li > div > a
-	//fmt.Println(offerParams.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.Data)
-
-	// ul > li > div > a > value (1)
-	seller 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(seller))
-
-	// ul > li (2) > div > a > value (1)
-	category 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(category))
-
-	// ul > li (3) > div > a > value (1)
-	make 		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(make))
-
-	// ul > li (4) > div > a > value (1)
-	model		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(model))
-
-	// ul > li (5) > div > a > value (1)
-	generation 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(generation))
-
-	//// ul > li (6) > div > value (1)
-	year 		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(year))
-
-	//// ul > li (7) > div > value (1)
-	mileage 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(mileage))
-
-	//// ul > li (8) > div > value (1)
-	engineCap 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(engineCap))
-
-	//// ul > li (9) > div > a > value (1)
-	fuelType 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(fuelType))
-
-	//// ul > li (10) > div > value (1)
-	power	 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(power))
-
-	//// ul > li (11) > div > a > value (1)
-	gearbox 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(gearbox))
-
-	//// ul > li (12) > div > a > value (1)
-	powertrain 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
-	fmt.Println(filterUnnecessaryChars(powertrain))
+	recursiveParams(offerParams.FirstChild.NextSibling.FirstChild.NextSibling, 0)
 
 	// temporary these params below won't be collected as otomoto has few different layouts for these params
 
+	//// ul > li > div > a > value (1)
+	//seller 		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(seller))
+	//
+	//// ul > li (2) > div > a > value (1)
+	//category 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(category))
+	//
+	//// ul > li (3) > div > a > value (1)
+	//make 		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(make))
+	//
+	//// ul > li (4) > div > a > value (1)
+	//model		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(model))
+	//
+	//// ul > li (5) > div > a > value (1)
+	//generation 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(generation))
+	//
+	////// ul > li (6) > div > value (1)
+	//year 		:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(year))
+	//
+	////// ul > li (7) > div > value (1)
+	//mileage 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(mileage))
+	//
+	////// ul > li (8) > div > value (1)
+	//engineCap 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(engineCap))
+	//
+	////// ul > li (9) > div > a > value (1)
+	//fuelType 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(fuelType))
+	//
+	////// ul > li (10) > div > value (1)
+	//power	 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(power))
+	//
+	////// ul > li (11) > div > a > value (1)
+	//gearbox 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(gearbox))
+	//
+	////// ul > li (12) > div > a > value (1)
+	//powertrain 	:= offerParams.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
+	//fmt.Println(filterUnnecessaryChars(powertrain))
+	//
 	//// ul > li (13) > div > a > value (1)
 	//chassis 	:= offerParams.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.NextSibling.FirstChild.Data
 	//fmt.Println(filterUnnecessaryChars(chassis))
