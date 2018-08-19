@@ -26,6 +26,8 @@ Further plans:
 * ~Move from python to node.js~
 * Create client side in react/angular with user-friendly interface/graphs etc
 
+### In case of any build problems, Travis is constantly looking after
+<img src="https://travis-ci.org/oziomek1/scraper.svg?branch=master"/>
 
 There's a possibility that it'll be moved from otomoto to olx/allegro scrapping due to not ideal interface there..
 
