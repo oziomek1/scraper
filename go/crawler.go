@@ -61,7 +61,7 @@ func urlLinkCrawl(htmlTag string, url string, pageData []PageData, offers []Offe
 
 	visitOffers(currentData, offers)
 
-	if currentData.nextPageUrl != "" && iteration < 2 {
+	if currentData.nextPageUrl != "" {
 		iteration += 1
 		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, offers, iteration)
 	} else {
