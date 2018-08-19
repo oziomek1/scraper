@@ -3,6 +3,7 @@ package main
 import (
 	"golang.org/x/net/html"
 	"strings"
+	"fmt"
 )
 
 // -------------------------------------
@@ -137,6 +138,54 @@ func nextPageLink(page *html.Node) (nextPage string) {
 	return nextPage
 }
 
+// -------------------------------------
+// Get value of each param
+// -------------------------------------
+func getParamValue(page *html.Node) (string) {
+	searchable := page.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild
+
+	if searchable.NextSibling == nil {
+		return filterUnnecessaryChars(searchable.Data)
+	} else {
+		return filterUnnecessaryChars(searchable.NextSibling.FirstChild.Data)
+	}
+}
+
+// -------------------------------------
+// Get value of each param label
+// -------------------------------------
+func getParamLabel(page *html.Node) (string) {
+	return filterUnnecessaryChars(page.FirstChild.NextSibling.FirstChild.Data)
+}
+
+// -------------------------------------
+// Collect all the params with labels of the offer
+// -------------------------------------
+func offerParam(page *html.Node, values []string, labels []string) ([]string, []string) {
+	var paramValue string
+	var paramLabel string
+	if page.Type == html.ElementNode && page.Data == "li"{
+		if len(page.Attr) > 0 && page.Attr[0].Key == "class" && page.Attr[0].Val == "offer-params__item" {
+			paramValue = getParamValue(page)
+			paramLabel = getParamLabel(page)
+			fmt.Println(paramLabel, paramValue)
+			labels = append(labels, paramLabel)
+			values = append(values, paramValue)
+		}
+	}
+	for c := page.FirstChild; c != nil; c = c.NextSibling {
+		values, labels = offerParam(c, values, labels)
+		if paramValue != "" {
+			break
+		}
+	}
+
+	return values, labels
+}
+
+// -------------------------------------
+// Prevent \n \t \r etc.
+// -------------------------------------
 func filterUnnecessaryChars(s string) string {
 	s = strings.Map(func(r rune) rune {
 		switch r {

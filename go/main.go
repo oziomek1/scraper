@@ -114,6 +114,6 @@ func main() {
 	urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
 
 	//offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
-	// readOffer(offerUrl)
+	//readOffer(offerUrl)
 
 }

@@ -41,11 +41,12 @@ func visitOffers(data PageData, offers []Offer) {
 	for _, link := range data.links {
 		go visitOffer(link, offers)
 	}
-	fmt.Println(len(offers))
 }
 
 // -------------------------------------
-// Main loop, iterate whenever next page button exists
+// Main loop
+// - collect urls for offers
+// - iterate whenever next page button exists
 // -------------------------------------
 func urlLinkCrawl(htmlTag string, url string, pageData []PageData, offers []Offer, iteration int) {
 	pageContent, err := parseUrlToNode(url)
@@ -60,14 +61,10 @@ func urlLinkCrawl(htmlTag string, url string, pageData []PageData, offers []Offe
 
 	visitOffers(currentData, offers)
 
-	for _, o := range offers {
-		fmt.Println("PRINTUJ", o.url)
-	}
-
-	if currentData.nextPageUrl != "" {
+	if currentData.nextPageUrl != "" && iteration < 2 {
 		iteration += 1
 		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, offers, iteration)
 	} else {
-		fmt.Println("The end of offers")
+		fmt.Println("THIS IS THE END OF OFFERS")
 	}
 }
