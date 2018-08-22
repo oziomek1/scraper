@@ -3,7 +3,6 @@ package main
 import (
 	"golang.org/x/net/html"
 	"strings"
-	"fmt"
 )
 
 // -------------------------------------
@@ -161,20 +160,19 @@ func getParamLabel(page *html.Node) (string) {
 // -------------------------------------
 // Collect all the params with labels of the offer
 // -------------------------------------
-func offerParam(page *html.Node, values []string, labels []string) ([]string, []string) {
+func getOfferParam(page *html.Node, values []string, labels []string) ([]string, []string) {
 	var paramValue string
 	var paramLabel string
 	if page.Type == html.ElementNode && page.Data == "li"{
 		if len(page.Attr) > 0 && page.Attr[0].Key == "class" && page.Attr[0].Val == "offer-params__item" {
 			paramValue = getParamValue(page)
 			paramLabel = getParamLabel(page)
-			fmt.Println(paramLabel, paramValue)
 			labels = append(labels, paramLabel)
 			values = append(values, paramValue)
 		}
 	}
 	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		values, labels = offerParam(c, values, labels)
+		values, labels = getOfferParam(c, values, labels)
 		if paramValue != "" {
 			break
 		}

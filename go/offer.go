@@ -34,9 +34,13 @@ type Params struct {
 	seller, category, make, model string
 	generation, year, mileage, engineCapacity string
 	fuelType, power, gearbox, powertrain string
-	chassis, doors, colour, country string
-	crashed, condition string
-	firstOwner, colission, serviceASO bool
+	chassis, doors, seats string
+	colour, acril, metallic, pearl string
+	licencePlate, VIN, crashed, vatInvoice string
+	financing, firstOwner, collisionFree string
+	rhd, country string
+	firstReg, regInPoland, serviceAuth, antiqueReg bool
+	tuning, condition string
 }
 
 type Offer struct {
@@ -76,12 +80,15 @@ func readOffer(url string) {
 	// Get offer currency
 	// -------------------------------------
 	currency, _ := getElementById("class", "offer-price__currency", pageContent)
-	fmt.Println(currency.FirstChild.Data)
+	currencyVal := currency.FirstChild.Data
+	fmt.Println(currencyVal)
 
 	// -------------------------------------
 	// Get offer params
 	// -------------------------------------
-	values, labels = offerParam(pageContent, values, labels)
+	values, labels = getOfferParam(pageContent, values, labels)
+	fmt.Println(labels)
+	fmt.Println(values)
 }
 
 func visitOffer(link string, offers []Offer) {
