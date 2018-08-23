@@ -35,7 +35,7 @@ type Params struct {
 	generation, year, mileage, engineCapacity string
 	fuelType, power, gearbox, powertrain string
 	chassis, doors, seats string
-	colour, acril, metallic, pearl string
+	colour, acrylic, metallic, pearl string
 	licencePlate, VIN, crashed, vatInvoice string
 	financing, firstOwner, collisionFree string
 	rhd, country string
@@ -45,18 +45,30 @@ type Params struct {
 
 type Offer struct {
 	url string
-	// Params
+	params Params
 	// Options
 }
 
-func readOffer(url string) {
+func assignParams(values []string, labels []string) (Params) {
+	var params Params
+	for idx, param := range labels {
+		for key, val := range paramDictionary {
+			if val == param {
+				fmt.Println(idx, key, val, values[idx])
+			}
+		}
+	}
+	return params
+}
+
+func readOffer(url string) (*Params) {
 
 	var values []string
 	var labels []string
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
 		fmt.Printf("Error with %s %s", pageContent, err)
-		return
+		return nil
 	}
 
 	fmt.Println("\n\nUrl:", url)
@@ -89,10 +101,13 @@ func readOffer(url string) {
 	values, labels = getOfferParam(pageContent, values, labels)
 	fmt.Println(labels)
 	fmt.Println(values)
+	params := assignParams(values, labels)
+	return &params
 }
 
 func visitOffer(link string, offers []Offer) {
-	readOffer(link)
-	offer := Offer{link}
+	params := readOffer(link)
+
+	offer := Offer{link, *params}
 	offers = append(offers, offer)
 }
