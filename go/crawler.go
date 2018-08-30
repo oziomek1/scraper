@@ -17,8 +17,9 @@ type PageData struct {
 // -------------------------------------
 // Find links for offers and print them
 // -------------------------------------
-func getAndShowLinks(htmlTag string, page *html.Node, iteration int) (links[] string) {
+func getAndShowLinks(htmlTag string, page *html.Node, iteration int, allLinks *[]string) (links[] string) {
 	links = getLinks(htmlTag, page, links)
+	*allLinks = append(*allLinks, links...)
 	for idx, link := range links {
 		fmt.Println(idx + 32*iteration + 1, " -> ", link)
 	}
@@ -37,7 +38,7 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 	return nextPageUrl
 }
 
-func visitOffers(data PageData, offers []Offer) {
+func visitOffers(data PageData, offers *[]Offer) {
 	for _, link := range data.links {
 		go visitOffer(link, offers)
 	}
@@ -48,7 +49,8 @@ func visitOffers(data PageData, offers []Offer) {
 // - collect urls for offers
 // - iterate whenever next page button exists
 // -------------------------------------
-func urlLinkCrawl(htmlTag string, url string, pageData []PageData, offers []Offer, iteration int) {
+func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Offer, allLinks *[]string, iteration int) {
+
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
 		fmt.Printf("Error with %s %s", pageContent, err)
@@ -56,14 +58,14 @@ func urlLinkCrawl(htmlTag string, url string, pageData []PageData, offers []Offe
 	}
 	fmt.Println("\nCurrent page title: ", pageTitle(pageContent))
 
-	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration), getAndShowNextPageUrl(pageContent)}
-	pageData = append(pageData, currentData)
+	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration, allLinks), getAndShowNextPageUrl(pageContent)}
+	*pageData = append(*pageData, currentData)
 
 	visitOffers(currentData, offers)
 
 	if currentData.nextPageUrl != "" {
 		iteration += 1
-		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, offers, iteration)
+		urlLinkCrawl(htmlTag, currentData.nextPageUrl, pageData, offers, allLinks, iteration)
 	} else {
 		fmt.Println("THIS IS THE END OF OFFERS")
 	}

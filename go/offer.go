@@ -69,7 +69,7 @@ func assignParams(url string, offerId string, price string, currency string, off
 	params.id, _ = strconv.Atoi(offerId)
 	params.price, _ = strconv.Atoi(price)
 	params.currency = currency
-	fmt.Println(url, "\n", params.id, params.price, params.currency)
+
 	params.seller = assignValue("SELLER", offerParams)
 	params.category = assignValue("CATEGORY", offerParams)
 	params.make = assignValue("MAKE", offerParams)
@@ -152,9 +152,9 @@ func readOffer(url string) (*Params) {
 	return &params
 }
 
-func visitOffer(link string, offers []Offer) {
+func visitOffer(link string, offers *[]Offer) {
 	params := readOffer(link)
 
 	offer := Offer{link, *params}
-	offers = append(offers, offer)
+	*offers = append(*offers, offer)
 }

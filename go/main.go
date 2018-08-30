@@ -95,7 +95,6 @@ func getOffersList(page *html.Node) string {
 	return offersList
 }
 
-
 func main() {
 	// ---------------------------------
 	// Define max number of goroutines (lightweight threads)
@@ -104,6 +103,7 @@ func main() {
 
 	var pageData []PageData
 	var offers []Offer
+	var allLinks []string
 
 	make, model := "volkswagen/", "golf/"
 	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "200"
@@ -111,8 +111,10 @@ func main() {
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
 
 	tagForLink := "data-href"
-	urlLinkCrawl(tagForLink, completeUrl, pageData, offers,0)
+	urlLinkCrawl(tagForLink, completeUrl, &pageData, &offers, &allLinks, 0)
 
 	//offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
 	//readOffer(offerUrl)
+
+
 }
