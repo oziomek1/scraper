@@ -58,7 +58,7 @@ func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Of
 	}
 
 	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration, allLinks), getAndShowNextPageUrl(pageContent)}
-	*pageData = append(*pageData, currentData)x
+	*pageData = append(*pageData, currentData)
 
 	if currentData.nextPageUrl != "" {
 		iteration += 1
