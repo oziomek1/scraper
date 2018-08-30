@@ -113,8 +113,10 @@ func main() {
 	tagForLink := "data-href"
 	urlLinkCrawl(tagForLink, completeUrl, &pageData, &offers, &allLinks, 0)
 
+	visitOffers(allLinks, &offers)
+
 	//offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
 	//readOffer(offerUrl)
-
+	fmt.Println("number of offers:", len(offers))
 
 }

@@ -118,8 +118,6 @@ func assignParams(url string, offerId string, price string, currency string, off
 
 func readOffer(url string) (*Params) {
 
-	var values []string
-	var labels []string
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
 		fmt.Printf("Error with %s %s", pageContent, err)
@@ -146,6 +144,8 @@ func readOffer(url string) (*Params) {
 	// -------------------------------------
 	// Get offer params
 	// -------------------------------------
+	var values []string
+	var labels []string
 	values, labels = getOfferParam(pageContent, values, labels)
 	paramsMap := slicesToMap(labels, values)
 	params := assignParams(url, offerId, price, currencyVal, paramsMap)

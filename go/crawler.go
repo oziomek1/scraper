@@ -38,9 +38,9 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 	return nextPageUrl
 }
 
-func visitOffers(data PageData, offers *[]Offer) {
-	for _, link := range data.links {
-		go visitOffer(link, offers)
+func visitOffers(links []string, offers *[]Offer) {
+	for _, link := range links {
+		visitOffer(link, offers)
 	}
 }
 
@@ -56,12 +56,9 @@ func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Of
 		fmt.Printf("Error with %s %s", pageContent, err)
 		return
 	}
-	fmt.Println("\nCurrent page title: ", pageTitle(pageContent))
 
 	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration, allLinks), getAndShowNextPageUrl(pageContent)}
-	*pageData = append(*pageData, currentData)
-
-	visitOffers(currentData, offers)
+	*pageData = append(*pageData, currentData)x
 
 	if currentData.nextPageUrl != "" {
 		iteration += 1
