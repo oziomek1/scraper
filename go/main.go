@@ -119,4 +119,7 @@ func main() {
 	//readOffer(offerUrl)
 	fmt.Println("number of offers:", len(offers))
 
+	filename := "otomotoData"
+	exportData(offers, filename)
+
 }

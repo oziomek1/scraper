@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
+	"log"
 )
 
 // -------------------------------------
@@ -53,7 +54,7 @@ func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Of
 
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
-		fmt.Printf("Error with %s %s", pageContent, err)
+		log.Fatal("Error with %s %s", pageContent, err)
 		return
 	}
 

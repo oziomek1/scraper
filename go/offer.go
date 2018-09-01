@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 )
 
@@ -30,7 +29,7 @@ type Options struct {
 
 type Params struct {
 	url string
-	id, price int
+	id, price string
 	currency string
 	seller, category, make, model string
 	generation, year, mileage, engineCapacity string
@@ -66,8 +65,8 @@ func assignValue(arg string, offerParams map[string]string) string {
 func assignParams(url string, offerId string, price string, currency string, offerParams map[string]string) (Params) {
 	var params Params
 	params.url = url
-	params.id, _ = strconv.Atoi(offerId)
-	params.price, _ = strconv.Atoi(price)
+	params.id = offerId
+	params.price = price
 	params.currency = currency
 
 	params.seller = assignValue("SELLER", offerParams)
@@ -112,7 +111,6 @@ func assignParams(url string, offerId string, price string, currency string, off
 	params.tuning = assignValue("TUNING", offerParams)
 	params.condition = assignValue("CONDITION", offerParams)
 
-	fmt.Println(params)
 	return params
 }
 
@@ -154,7 +152,7 @@ func readOffer(url string) (*Params) {
 
 func visitOffer(link string, offers *[]Offer) {
 	params := readOffer(link)
-
+	fmt.Println(*params)
 	offer := Offer{link, *params}
 	*offers = append(*offers, offer)
 }
