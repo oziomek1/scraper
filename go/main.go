@@ -106,7 +106,7 @@ func main() {
 	var allLinks []string
 
 	make, model := "volkswagen/", "golf/"
-	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "200"
+	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "350" + QUERY_JOIN + QUERY_START + power_to + "500"
 
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
 
@@ -119,7 +119,6 @@ func main() {
 	//readOffer(offerUrl)
 	fmt.Println("number of offers:", len(offers))
 
-	filename := "otomotoData"
-	exportData(offers, filename)
+	// exportData(offers, "otomotoData")
 
 }

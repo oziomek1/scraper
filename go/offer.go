@@ -3,9 +3,10 @@ package main
 import (
 	"fmt"
 	"strings"
+	"log"
 )
 
-type Options struct {
+type Features struct {
 	abs, cd, centralLock, elFrontWindows bool
 	elMirrors, immobiliser, driverAirbag, passengerAirbag bool
 	factoryRadio, driveAssist, alarm, aluWheels bool
@@ -46,10 +47,10 @@ type Params struct {
 type Offer struct {
 	url string
 	params Params
-	// Options
+	features Features
 }
 
-func assignValue(arg string, offerParams map[string]string) string {
+func assignParam(arg string, offerParams map[string]string) string {
 	paramValue := "-"
 	for dictKey, dictVal := range paramDictionary {
 		for offerKey, offerVal := range offerParams {
@@ -68,58 +69,139 @@ func assignParams(url string, offerId string, price string, currency string, off
 	params.id = offerId
 	params.price = price
 	params.currency = currency
+	params.seller = assignParam("SELLER", offerParams)
+	params.category = assignParam("CATEGORY", offerParams)
+	params.make = assignParam("MAKE", offerParams)
+	params.model = assignParam("MODEL", offerParams)
 
-	params.seller = assignValue("SELLER", offerParams)
-	params.category = assignValue("CATEGORY", offerParams)
-	params.make = assignValue("MAKE", offerParams)
-	params.model = assignValue("MODEL", offerParams)
+	params.generation = assignParam("GENERATION", offerParams)
+	params.year = assignParam("YEAR", offerParams)
+	params.mileage = assignParam("MILEAGE", offerParams)
+	params.engineCapacity = assignParam("ENGINE_CAPACITY", offerParams)
+	params.fuelType = assignParam("FUEL_TYPE", offerParams)
+	params.power = assignParam("POWER", offerParams)
+	params.gearbox = assignParam("GEARBOX", offerParams)
+	params.powertrain = assignParam("POWERTRAIN", offerParams)
 
-	params.generation = assignValue("GENERATION", offerParams)
-	params.year = assignValue("YEAR", offerParams)
-	params.mileage = assignValue("MILEAGE", offerParams)
-	params.engineCapacity = assignValue("ENGINE_CAPACITY", offerParams)
-	params.fuelType = assignValue("FUEL_TYPE", offerParams)
-	params.power = assignValue("POWER", offerParams)
-	params.gearbox = assignValue("GEARBOX", offerParams)
-	params.powertrain = assignValue("POWERTRAIN", offerParams)
+	params.chassis = assignParam("CHASSIS", offerParams)
+	params.doors = assignParam("DOORS", offerParams)
+	params.seats = assignParam("SEATS", offerParams)
 
-	params.chassis = assignValue("CHASSIS", offerParams)
-	params.doors = assignValue("DOORS", offerParams)
-	params.seats = assignValue("SEATS", offerParams)
+	params.colour = assignParam("COLOUR", offerParams)
+	params.acrylic = assignParam("ACRYLIC", offerParams)
+	params.metallic = assignParam("METALLIC", offerParams)
+	params.pearl = assignParam("PEARL", offerParams)
 
-	params.colour = assignValue("COLOUR", offerParams)
-	params.acrylic = assignValue("ACRYLIC", offerParams)
-	params.metallic = assignValue("METALLIC", offerParams)
-	params.pearl = assignValue("PEARL", offerParams)
+	params.licencePlate = assignParam("LICENCE_PLATE", offerParams)
+	params.VIN = assignParam("VIN", offerParams)
+	params.crashed = assignParam("CRASHED", offerParams)
+	params.vatInvoice = assignParam("VAT_INVOICE", offerParams)
+	params.financing = assignParam("FINANCING", offerParams)
+	params.firstOwner = assignParam("FIRST_OWNER", offerParams)
+	params.collisionFree = assignParam("COLLISION_FREE", offerParams)
 
-	params.licencePlate = assignValue("LICENCE_PLATE", offerParams)
-	params.VIN = assignValue("VIN", offerParams)
-	params.crashed = assignValue("CRASHED", offerParams)
-	params.vatInvoice = assignValue("VAT_INVOICE", offerParams)
-	params.financing = assignValue("FINANCING", offerParams)
-	params.firstOwner = assignValue("FIRST_OWNER", offerParams)
-	params.collisionFree = assignValue("COLLISION_FREE", offerParams)
+	params.rhd = assignParam("RHD", offerParams)
+	params.country = assignParam("COUNTRY", offerParams)
 
-	params.rhd = assignValue("RHD", offerParams)
-	params.country = assignValue("COUNTRY", offerParams)
+	params.firstReg = assignParam("FIRST_REGISTRATION", offerParams)
+	params.regInPoland = assignParam("REGISTER_IN_POLAND", offerParams)
+	params.serviceAuth = assignParam("SERVICE_AUTHORISED", offerParams)
+	params.antiqueReg = assignParam("ANTIQUE_REGISTERED", offerParams)
 
-	params.firstReg = assignValue("FIRST_REGISTRATION", offerParams)
-	params.regInPoland = assignValue("REGISTER_IN_POLAND", offerParams)
-	params.serviceAuth = assignValue("SERVICE_AUTHORISED", offerParams)
-	params.antiqueReg = assignValue("ANTIQUE_REGISTERED", offerParams)
-
-	params.tuning = assignValue("TUNING", offerParams)
-	params.condition = assignValue("CONDITION", offerParams)
+	params.tuning = assignParam("TUNING", offerParams)
+	params.condition = assignParam("CONDITION", offerParams)
 
 	return params
 }
 
-func readOffer(url string) (*Params) {
+func assignFeature(arg string, featureValues []string) bool {
+	feature := false
+	for _, val := range featureValues {
+		if val == arg {
+			return true
+		}
+	}
+	return feature
+}
+
+func assignFeatures(featureValues []string) (Features)  {
+	var features Features
+	features.abs = assignFeature(featuresList[0], featureValues)
+	features.cd = assignFeature(featuresList[1], featureValues)
+	features.centralLock = assignFeature(featuresList[2], featureValues)
+	features.elFrontWindows = assignFeature(featuresList[3], featureValues)
+	features.elMirrors = assignFeature(featuresList[4], featureValues)
+	features.immobiliser = assignFeature(featuresList[5], featureValues)
+	features.driverAirbag = assignFeature(featuresList[6], featureValues)
+	features.passengerAirbag = assignFeature(featuresList[7], featureValues)
+	features.factoryRadio = assignFeature(featuresList[8], featureValues)
+	features.driveAssist = assignFeature(featuresList[9], featureValues)
+	features.alarm = assignFeature(featuresList[10], featureValues)
+	features.aluWheels = assignFeature(featuresList[11], featureValues)
+	features.asr = assignFeature(featuresList[12], featureValues)
+	features.parkAssist = assignFeature(featuresList[13], featureValues)
+	features.laneAssist = assignFeature(featuresList[14], featureValues)
+	features.bluetooth = assignFeature(featuresList[15], featureValues)
+	features.rainSensor = assignFeature(featuresList[16], featureValues)
+	features.blindSpotMonitor = assignFeature(featuresList[17], featureValues)
+	features.nightSensor = assignFeature(featuresList[18], featureValues)
+	features.frontParkAssist = assignFeature(featuresList[19], featureValues)
+	features.rearParkAssist = assignFeature(featuresList[20], featureValues)
+	features.panoramaGlassRoof = assignFeature(featuresList[21], featureValues)
+	features.elSeats = assignFeature(featuresList[22], featureValues)
+	features.esp = assignFeature(featuresList[23], featureValues)
+	features.aux = assignFeature(featuresList[24], featureValues)
+	features.sdCard = assignFeature(featuresList[25], featureValues)
+	features.usb = assignFeature(featuresList[26], featureValues)
+	features.towHook = assignFeature(featuresList[27], featureValues)
+	features.hud = assignFeature(featuresList[28], featureValues)
+	features.isofix = assignFeature(featuresList[29], featureValues)
+	features.rearCamera = assignFeature(featuresList[30], featureValues)
+	features.autoAirCon = assignFeature(featuresList[31], featureValues)
+	features.autoAirCon4 = assignFeature(featuresList[32], featureValues)
+	features.autoAirCon2 = assignFeature(featuresList[33], featureValues)
+	features.manualAirCon = assignFeature(featuresList[34], featureValues)
+	features.computer = assignFeature(featuresList[35], featureValues)
+	features.airBagCourtain = assignFeature(featuresList[36], featureValues)
+	features.paddleShift = assignFeature(featuresList[37], featureValues)
+	features.mp3 = assignFeature(featuresList[38], featureValues)
+	features.gps = assignFeature(featuresList[39], featureValues)
+	features.dvd = assignFeature(featuresList[40], featureValues)
+	features.speedLimiter = assignFeature(featuresList[41], featureValues)
+	features.webasto = assignFeature(featuresList[42], featureValues)
+	features.heatedWindShield = assignFeature(featuresList[43], featureValues)
+	features.heatedSideMirror = assignFeature(featuresList[44], featureValues)
+	features.heatedFrontSeat = assignFeature(featuresList[45], featureValues)
+	features.heatedRearSeat = assignFeature(featuresList[46], featureValues)
+	features.kneeAirBag = assignFeature(featuresList[47], featureValues)
+	features.frontSideAirBag = assignFeature(featuresList[48], featureValues)
+	features.rearSideAirBag = assignFeature(featuresList[49], featureValues)
+	features.tintedWindow = assignFeature(featuresList[50], featureValues)
+	features.nonFactoryRadio = assignFeature(featuresList[51], featureValues)
+	features.adjustableSuspension = assignFeature(featuresList[52], featureValues)
+	features.roofRail = assignFeature(featuresList[53], featureValues)
+	features.startStop = assignFeature(featuresList[54], featureValues)
+	features.sunroof = assignFeature(featuresList[55], featureValues)
+	features.dayLight = assignFeature(featuresList[56], featureValues)
+	features.ledLight = assignFeature(featuresList[57], featureValues)
+	features.antifogLight = assignFeature(featuresList[58], featureValues)
+	features.xenonLight = assignFeature(featuresList[59], featureValues)
+	features.leather = assignFeature(featuresList[60], featureValues)
+	features.velour = assignFeature(featuresList[61], featureValues)
+	features.cruiseControl = assignFeature(featuresList[62], featureValues)
+	features.activeCruiseControl = assignFeature(featuresList[63], featureValues)
+	features.tunerTV = assignFeature(featuresList[64], featureValues)
+	features.multifuncionalWheel = assignFeature(featuresList[65], featureValues)
+	features.changerCD = assignFeature(featuresList[66], featureValues)
+	return features
+}
+
+func readOffer(url string) (*Params, *Features) {
 
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
-		fmt.Printf("Error with %s %s", pageContent, err)
-		return nil
+		log.Fatal("Error with %s %s", pageContent, err)
+		return nil, nil
 	}
 
 	// -------------------------------------
@@ -136,23 +218,27 @@ func readOffer(url string) (*Params) {
 	// -------------------------------------
 	// Get offer currency
 	// -------------------------------------
-	currency, _ := getElementById("class", "offer-price__currency", pageContent)
-	currencyVal := currency.FirstChild.Data
+	// currency, _ := getElementById("class", "offer-price__currency", pageContent)
+	 currencyVal := "PLN"
 
 	// -------------------------------------
 	// Get offer params
 	// -------------------------------------
 	var values []string
 	var labels []string
+	var featureValues []string
 	values, labels = getOfferParam(pageContent, values, labels)
+	featureValues = getOfferFeatures(pageContent, featureValues)
 	paramsMap := slicesToMap(labels, values)
 	params := assignParams(url, offerId, price, currencyVal, paramsMap)
-	return &params
+	features := assignFeatures(featureValues)
+	return &params, &features
 }
 
 func visitOffer(link string, offers *[]Offer) {
-	params := readOffer(link)
+	params, features := readOffer(link)
 	fmt.Println(*params)
-	offer := Offer{link, *params}
+	fmt.Println(*features)
+	offer := Offer{link, *params, *features}
 	*offers = append(*offers, offer)
 }

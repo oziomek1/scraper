@@ -181,6 +181,29 @@ func getOfferParam(page *html.Node, values []string, labels []string) ([]string,
 	return values, labels
 }
 
+func getFeature(page *html.Node) (string)  {
+	return filterUnnecessaryChars(page.FirstChild.NextSibling.NextSibling.Data)
+}
+
+func getOfferFeatures(page *html.Node, features []string) ([]string)  {
+	var feature string
+	if page.Type == html.ElementNode && page.Data == "li" {
+		if len(page.Attr) > 0 && page.Attr[0].Key == "class" && page.Attr[0].Val == "offer-features__item" {
+			feature = getFeature(page)
+			features = append(features, feature)
+		}
+	}
+
+	for c := page.FirstChild; c != nil; c = c.NextSibling {
+		features = getOfferFeatures(c, features)
+		if feature != "" {
+			break
+		}
+	}
+
+	return features
+}
+
 // -------------------------------------
 // Prevent \n \t \r etc.
 // -------------------------------------
