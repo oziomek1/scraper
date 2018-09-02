@@ -32,6 +32,7 @@ type Params struct {
 	url string
 	id, price string
 	currency string
+	time, date string
 	seller, category, make, model string
 	generation, year, mileage, engineCapacity string
 	fuelType, power, gearbox, powertrain string
@@ -51,7 +52,7 @@ type Offer struct {
 }
 
 func assignParam(arg string, offerParams map[string]string) string {
-	paramValue := "-"
+	paramValue := `NULL`
 	for dictKey, dictVal := range paramDictionary {
 		for offerKey, offerVal := range offerParams {
 			if arg == dictKey && dictVal == offerKey {
@@ -63,12 +64,14 @@ func assignParam(arg string, offerParams map[string]string) string {
 	return paramValue
 }
 
-func assignParams(url string, offerId string, price string, currency string, offerParams map[string]string) (Params) {
+func assignParams(url string, offerId string, price string, currency string, time string, date string, offerParams map[string]string) (Params) {
 	var params Params
 	params.url = url
 	params.id = offerId
 	params.price = price
 	params.currency = currency
+	params.time = time
+	params.date = date
 	params.seller = assignParam("SELLER", offerParams)
 	params.category = assignParam("CATEGORY", offerParams)
 	params.make = assignParam("MAKE", offerParams)
@@ -210,6 +213,11 @@ func readOffer(url string) (*Params, *Features) {
 	offerId := getElementByTag("data-id_raw", pageContent)
 
 	// -------------------------------------
+	// Get offer time and date
+	// -------------------------------------
+	offerTime, offerDate := getOfferTimeAndDate("offer-meta__value", pageContent)
+
+	// -------------------------------------
 	// Get offer price
 	// -------------------------------------
 	price := getElementByTag("data-price", pageContent)
@@ -227,10 +235,16 @@ func readOffer(url string) (*Params, *Features) {
 	var values []string
 	var labels []string
 	var featureValues []string
-	values, labels = getOfferParam(pageContent, values, labels)
-	featureValues = getOfferFeatures(pageContent, featureValues)
+
+	attributeType := "class"
+	nodeTag := "offer-params"
+	pageNodeContent, _ := getElementById(attributeType, nodeTag, pageContent)
+	values, labels = getOfferParam(pageNodeContent, values, labels)
+	nodeTag = "offer-features"
+	pageNodeContent, _ = getElementById(attributeType, nodeTag, pageContent)
+	featureValues = getOfferFeatures(pageNodeContent, featureValues)
 	paramsMap := slicesToMap(labels, values)
-	params := assignParams(url, offerId, price, currencyVal, paramsMap)
+	params := assignParams(url, offerId, price, currencyVal, offerTime, offerDate, paramsMap)
 	features := assignFeatures(featureValues)
 	return &params, &features
 }

@@ -60,7 +60,7 @@ func writeFile(writer *csv.Writer, data [][]string)  {
 
 func writeHeader(writer *csv.Writer)  {
 	// Has to do it manually as golang map order is randomized
-	headers := []string{"URL", "ID", "PRICE", "CURRENCY",
+	headers := []string{"URL", "ID", "PRICE", "CURRENCY", "TIME", "DATE",
 						"SELLER", "CATEGORY", "MAKE", "MODEL",
 						"GENERATION", "YEAR", "MILEAGE", "ENGINE_CAPACITY",
 						"FUEL_TYPE", "POWER", "GEARBOX", "POWERTRAIN",

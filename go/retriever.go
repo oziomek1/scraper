@@ -82,21 +82,27 @@ func getLinks(tag string, page *html.Node, links []string) ([]string) {
 
 
 // -------------------------------------
-// Get page element value by tag name
+// Get offer time and date values by tag name
 // -------------------------------------
-func pageElementValue(tag string, page *html.Node) (string) {
+func getOfferTimeAndDate(tag string, page *html.Node) (string, string) {
+	time := ""
+	date := ""
 	var value string
-	if page.Type == html.ElementNode && page.Data == tag {
-		value = page.FirstChild.Data
-		return value
+	if page.Type == html.ElementNode && page.Data == "span" {
+		if len(page.Attr) > 0 && page.Attr[0].Key == "class" && page.Attr[0].Val == tag {
+			value = page.FirstChild.Data
+			values := strings.Split(value, ", ")
+			time, date = values[0], values[1]
+			return time, date
+		}
 	}
 	for c := page.FirstChild; c != nil; c = c.NextSibling {
-		value = pageTitle(c)
-		if value != "" {
+		time, date = getOfferTimeAndDate(tag, c)
+		if time != "" && date != "" {
 			break
 		}
 	}
-	return value
+	return time, date
 }
 
 // -------------------------------------
@@ -163,7 +169,10 @@ func getParamLabel(page *html.Node) (string) {
 func getOfferParam(page *html.Node, values []string, labels []string) ([]string, []string) {
 	var paramValue string
 	var paramLabel string
-	if page.Type == html.ElementNode && page.Data == "li"{
+	if page == nil {
+		return values, labels
+	}
+	if page.Type == html.ElementNode && page.Data == "li" {
 		if len(page.Attr) > 0 && page.Attr[0].Key == "class" && page.Attr[0].Val == "offer-params__item" {
 			paramValue = getParamValue(page)
 			paramLabel = getParamLabel(page)
@@ -187,6 +196,9 @@ func getFeature(page *html.Node) (string)  {
 
 func getOfferFeatures(page *html.Node, features []string) ([]string)  {
 	var feature string
+	if page == nil {
+		return features
+	}
 	if page.Type == html.ElementNode && page.Data == "li" {
 		if len(page.Attr) > 0 && page.Attr[0].Key == "class" && page.Attr[0].Val == "offer-features__item" {
 			feature = getFeature(page)
