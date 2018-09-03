@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"log"
+	"sync"
 )
 
 type Features struct {
@@ -249,10 +250,10 @@ func readOffer(url string) (*Params, *Features) {
 	return &params, &features
 }
 
-func visitOffer(link string, offers *[]Offer) {
+func visitOffer(link string, offers *[]Offer, wg *sync.WaitGroup) {
+	defer wg.Done()
 	params, features := readOffer(link)
 	fmt.Println(*params)
-	fmt.Println(*features)
 	offer := Offer{link, *params, *features}
 	*offers = append(*offers, offer)
 }

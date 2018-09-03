@@ -2,9 +2,8 @@ package main
 
 import (
 	"fmt"
-
 	"golang.org/x/net/html"
-	"runtime"
+	time2 "time"
 )
 
 // -------------------------------------
@@ -99,14 +98,15 @@ func main() {
 	// ---------------------------------
 	// Define max number of goroutines (lightweight threads)
 	// ---------------------------------
-	runtime.GOMAXPROCS(5)
+
+	start := time2.Now()
 
 	var pageData []PageData
 	var offers []Offer
 	var allLinks []string
 
 	make, model := "volkswagen/", "golf/"
-	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "350"
+	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "120" + QUERY_JOIN + QUERY_START + power_to + "130"
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
 
 	tagForLink := "data-href"
@@ -119,5 +119,7 @@ func main() {
 	fmt.Println("number of offers:", len(offers))
 
 	// exportData(offers, "otomotoData1")
+
+	fmt.Println(time2.Since(start))
 
 }

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"golang.org/x/net/html"
 	"log"
+	"sync"
 )
 
 // -------------------------------------
@@ -18,12 +19,9 @@ type PageData struct {
 // -------------------------------------
 // Find links for offers and print them
 // -------------------------------------
-func getAndShowLinks(htmlTag string, page *html.Node, iteration int, allLinks *[]string) (links[] string) {
+func getAndShowLinks(htmlTag string, page *html.Node, allLinks *[]string) (links[] string) {
 	links = getLinks(htmlTag, page, links)
 	*allLinks = append(*allLinks, links...)
-	for idx, link := range links {
-		fmt.Println(idx + 32*iteration + 1, " -> ", link)
-	}
 	return links
 }
 
@@ -40,9 +38,12 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 }
 
 func visitOffers(links []string, offers *[]Offer) {
+	var wg = sync.WaitGroup{}
+	wg.Add(len(links))
 	for _, link := range links {
-		visitOffer(link, offers)
+		go visitOffer(link, offers, &wg)
 	}
+	wg.Wait()
 }
 
 // -------------------------------------
@@ -58,7 +59,7 @@ func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Of
 		return
 	}
 
-	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, iteration, allLinks), getAndShowNextPageUrl(pageContent)}
+	currentData := PageData{iteration + 1,  getAndShowLinks(htmlTag, pageContent, allLinks), getAndShowNextPageUrl(pageContent)}
 	*pageData = append(*pageData, currentData)
 
 	if currentData.nextPageUrl != "" {
