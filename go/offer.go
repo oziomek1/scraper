@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strings"
-	"log"
 	"sync"
 )
 
@@ -204,7 +203,7 @@ func readOffer(url string) (*Params, *Features) {
 
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
-		log.Fatal("Error with %s %s", pageContent, err)
+		fmt.Printf("Error with %s %s", pageContent, err)
 		return nil, nil
 	}
 
@@ -247,13 +246,20 @@ func readOffer(url string) (*Params, *Features) {
 	paramsMap := slicesToMap(labels, values)
 	params := assignParams(url, offerId, price, currencyVal, offerTime, offerDate, paramsMap)
 	features := assignFeatures(featureValues)
+	if params.id == "" {
+		fmt.Println("[WARN] EMPTY LINK")
+	}
+	fmt.Println(params)
 	return &params, &features
 }
 
 func visitOffer(link string, offers *[]Offer, wg *sync.WaitGroup) {
 	defer wg.Done()
-	params, features := readOffer(link)
-	fmt.Println(*params)
-	offer := Offer{link, *params, *features}
-	*offers = append(*offers, offer)
+	if link != "" {
+		params, features := readOffer(link)
+		offer := Offer{link, *params, *features}
+		*offers = append(*offers, offer)
+	} else {
+		fmt.Println("[WARN] EMPTY LINK")
+	}
 }

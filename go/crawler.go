@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
-	"log"
 	"sync"
 )
 
@@ -38,12 +37,16 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 }
 
 func visitOffers(links []string, offers *[]Offer) {
-	var wg = sync.WaitGroup{}
-	wg.Add(len(links))
-	for _, link := range links {
-		go visitOffer(link, offers, &wg)
+	miniBatchSize := 100
+	for i := 0; i < len(links); i += miniBatchSize {
+		miniBatchLinks := links[i:i+miniBatchSize]
+		var wg = sync.WaitGroup{}
+		wg.Add(len(miniBatchLinks))
+		for _, link := range miniBatchLinks {
+			go visitOffer(link, offers, &wg)
+		}
+		wg.Wait()
 	}
-	wg.Wait()
 }
 
 // -------------------------------------
@@ -55,7 +58,7 @@ func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Of
 
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
-		log.Fatal("Error with %s %s", pageContent, err)
+		fmt.Println("Error with %s %s", pageContent, err)
 		return
 	}
 

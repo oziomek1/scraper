@@ -106,7 +106,7 @@ func main() {
 	var allLinks []string
 
 	make, model := "volkswagen/", "golf/"
-	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "120" + QUERY_JOIN + QUERY_START + power_to + "130"
+	completeUrl := BASE_URL + passenger + make + model
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
 
 	tagForLink := "data-href"
@@ -114,11 +114,9 @@ func main() {
 
 	visitOffers(allLinks, &offers)
 
-	//offerUrl := "https://www.otomoto.pl/oferta/volkswagen-golf-gti-2-0-tsi-245-km-dsg-rok-pr-2018-ID6zLSJV.html#a509fcd179"
-	//readOffer(offerUrl)
 	fmt.Println("number of offers:", len(offers))
 
-	// exportData(offers, "otomotoData1")
+	exportData(offers, "otomotoVWGolf")
 
 	fmt.Println(time2.Since(start))
 
