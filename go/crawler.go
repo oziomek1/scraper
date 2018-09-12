@@ -37,15 +37,22 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 }
 
 func visitOffers(links []string, offers *[]Offer) {
+	var unReadedUrls []string
 	miniBatchSize := 100
 	for i := 0; i < len(links); i += miniBatchSize {
 		miniBatchLinks := links[i:i+miniBatchSize]
 		var wg = sync.WaitGroup{}
 		wg.Add(len(miniBatchLinks))
 		for _, link := range miniBatchLinks {
-			go visitOffer(link, offers, &wg)
+			go visitOffer(link, offers, &unReadedUrls, &wg)
 		}
 		wg.Wait()
+	}
+	/* Used for crawl through the offers with no collected parameters.
+	 * Probably possible to remove, the problem with lack of these parameters
+	 * is related to otomoto itself (Access denied) */
+	for _, link := range unReadedUrls {
+		visitOffer(link, offers, &unReadedUrls, nil)
 	}
 }
 

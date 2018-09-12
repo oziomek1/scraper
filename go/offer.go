@@ -199,7 +199,7 @@ func assignFeatures(featureValues []string) (Features)  {
 	return features
 }
 
-func readOffer(url string) (*Params, *Features) {
+func readOffer(url string, unreadedLinks *[]string) (*Params, *Features) {
 
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
@@ -245,18 +245,21 @@ func readOffer(url string) (*Params, *Features) {
 	featureValues = getOfferFeatures(pageNodeContent, featureValues)
 	paramsMap := slicesToMap(labels, values)
 	params := assignParams(url, offerId, price, currencyVal, offerTime, offerDate, paramsMap)
-	features := assignFeatures(featureValues)
-	if params.id == "" {
-		fmt.Println("[WARN] EMPTY LINK")
+	if params.model == "" || params.model == `NULL` {
+		fmt.Println("NO DATA")
+		*unreadedLinks = append(*unreadedLinks, url)
 	}
+	features := assignFeatures(featureValues)
 	fmt.Println(params)
 	return &params, &features
 }
 
-func visitOffer(link string, offers *[]Offer, wg *sync.WaitGroup) {
-	defer wg.Done()
+func visitOffer(link string, offers *[]Offer, unreadedUrls *[]string, wg *sync.WaitGroup) {
+	if wg != nil {
+		defer wg.Done()
+	}
 	if link != "" {
-		params, features := readOffer(link)
+		params, features := readOffer(link, unreadedUrls)
 		offer := Offer{link, *params, *features}
 		*offers = append(*offers, offer)
 	} else {
