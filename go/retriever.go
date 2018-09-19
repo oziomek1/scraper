@@ -190,10 +190,16 @@ func getOfferParam(page *html.Node, values []string, labels []string) ([]string,
 	return values, labels
 }
 
+// -------------------------------------
+// Get value of each feature
+// -------------------------------------
 func getFeature(page *html.Node) (string)  {
 	return filterUnnecessaryChars(page.FirstChild.NextSibling.NextSibling.Data)
 }
 
+// -------------------------------------
+// Get all features of an offer
+// -------------------------------------
 func getOfferFeatures(page *html.Node, features []string) ([]string)  {
 	var feature string
 	if page == nil {
@@ -216,6 +222,9 @@ func getOfferFeatures(page *html.Node, features []string) ([]string)  {
 	return features
 }
 
+// -------------------------------------
+// Get safe currency value
+// -------------------------------------
 func getCurrencyValue(currency *html.Node) (string) {
 	if currency.FirstChild != nil {
 		return currency.FirstChild.Data
