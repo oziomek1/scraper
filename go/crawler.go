@@ -48,9 +48,12 @@ func visitOffers(links []string, offers *[]Offer) {
 		}
 		wg.Wait()
 	}
-	/* Used for crawl through the offers with no collected parameters.
-	 * Probably possible to remove, the problem with lack of these parameters
-	 * is related to otomoto itself (Access denied) */
+
+	// -------------------------------------
+	// Used for crawl through the offers with no collected parameters.
+	// Probably possible to remove, the problem with lack of these parameters
+	// is related to otomoto itself (Access denied)
+	// -------------------------------------
 	for _, link := range unReadedUrls {
 		visitOffer(link, offers, &unReadedUrls, nil)
 	}
@@ -65,7 +68,7 @@ func urlLinkCrawl(htmlTag string, url string, pageData *[]PageData, offers *[]Of
 
 	pageContent, err := parseUrlToNode(url)
 	if err != nil {
-		fmt.Println("Error with %s %s", pageContent, err)
+		fmt.Println("Error with", pageContent, err)
 		return
 	}
 

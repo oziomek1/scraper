@@ -216,6 +216,13 @@ func getOfferFeatures(page *html.Node, features []string) ([]string)  {
 	return features
 }
 
+func getCurrencyValue(currency *html.Node) (string) {
+	if currency.FirstChild != nil {
+		return currency.FirstChild.Data
+	}
+	return ""
+}
+
 // -------------------------------------
 // Prevent \n \t \r etc.
 // -------------------------------------
