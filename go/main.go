@@ -112,6 +112,8 @@ func main() {
 	tagForLink := "data-href"
 	urlLinkCrawl(tagForLink, completeUrl, &pageData, &offers, &allLinks, 0)
 
+	allLinks = removeEmptyLinks(allLinks)
+
 	visitOffers(allLinks, &offers)
 
 	fmt.Println("number of offers:", len(offers))

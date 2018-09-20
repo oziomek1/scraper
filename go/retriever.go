@@ -70,7 +70,7 @@ func getElementByTag(tag string, page *html.Node) (string) {
 // -------------------------------------
 func getLinks(tag string, page *html.Node, links []string) ([]string) {
 	for _, a := range page.Attr {
-		if a.Key == tag {
+		if a.Key == tag && a.Val != "" {
 			links = append(links, a.Val)
 		}
 	}

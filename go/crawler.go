@@ -36,6 +36,9 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 	return nextPageUrl
 }
 
+// -------------------------------------
+// Read all offers values using minibatches and goroutines for multithreading
+// -------------------------------------
 func visitOffers(links []string, offers *[]Offer) {
 	var unReadedUrls []string
 	miniBatchSize := 100
@@ -54,9 +57,22 @@ func visitOffers(links []string, offers *[]Offer) {
 	// Probably possible to remove, the problem with lack of these parameters
 	// is related to otomoto itself (Access denied)
 	// -------------------------------------
+	fmt.Println("[INFO] PUSHING UNREADED LINKS ONCE AGAIN")
 	for _, link := range unReadedUrls {
 		visitOffer(link, offers, &unReadedUrls, nil)
 	}
+}
+
+// -------------------------------------
+// Remove any empty links inside array
+// -------------------------------------
+func removeEmptyLinks(allLinks []string) (links []string) {
+	for _, link := range allLinks {
+		if link != "" {
+			links = append(links, link)
+		}
+	}
+	return links
 }
 
 // -------------------------------------
