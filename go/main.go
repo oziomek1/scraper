@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"golang.org/x/net/html"
 	time2 "time"
+	"runtime"
 )
 
 // -------------------------------------
@@ -98,6 +99,7 @@ func main() {
 	// ---------------------------------
 	// Define max number of goroutines (lightweight threads)
 	// ---------------------------------
+	runtime.GOMAXPROCS(32)
 
 	start := time2.Now()
 
@@ -111,8 +113,6 @@ func main() {
 
 	tagForLink := "data-href"
 	urlLinkCrawl(tagForLink, completeUrl, &pageData, &offers, &allLinks, 0)
-
-	allLinks = removeEmptyLinks(allLinks)
 
 	visitOffers(allLinks, &offers)
 

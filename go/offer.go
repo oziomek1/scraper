@@ -200,7 +200,7 @@ func assignFeatures(featureValues []string) (Features)  {
 	return features
 }
 
-func readOffer(url string, unreadedLinks *[]string) (*Params, *Features) {
+func readOffer(url string) (*Params, *Features) {
 
 	time2.Sleep(10 * time2.Millisecond)
 	pageContent, err := parseUrlToNode(url)
@@ -238,21 +238,22 @@ func readOffer(url string, unreadedLinks *[]string) (*Params, *Features) {
 	var labels []string
 	var featureValues []string
 
+	// -------------------------------------
+	// Collect parameters
+	// -------------------------------------
 	attributeType := "class"
-	nodeTag := "offer-params"
-	pageNodeContent, _ := getElementById(attributeType, nodeTag, pageContent)
+	pageNodeContent, _ := getElementById(attributeType, "offer-params", pageContent)
 	values, labels = getOfferParam(pageNodeContent, values, labels)
-	nodeTag = "offer-features"
-	pageNodeContent, _ = getElementById(attributeType, nodeTag, pageContent)
-	featureValues = getOfferFeatures(pageNodeContent, featureValues)
 	paramsMap := slicesToMap(labels, values)
 	params := assignParams(url, offerId, price, currency, offerTime, offerDate, paramsMap)
-	if params.model == "" || params.model == `NULL` {
-		fmt.Println("NO DATA")
-		*unreadedLinks = append(*unreadedLinks, url)
-	}
+
+	// -------------------------------------
+	// Collect features
+	// -------------------------------------
+	pageNodeContent, _ = getElementById(attributeType, "offer-features", pageContent)
+	featureValues = getOfferFeatures(pageNodeContent, featureValues)
 	features := assignFeatures(featureValues)
-	fmt.Println(params)
+
 	return &params, &features
 }
 
@@ -261,7 +262,12 @@ func visitOffer(link string, offers *[]Offer, unreadedUrls *[]string, wg *sync.W
 		defer wg.Done()
 	}
 	if link != "" {
-		params, features := readOffer(link, unreadedUrls)
+		params, features := readOffer(link)
+		if params.model == "" || params.model == `NULL` {
+			*unreadedUrls = append(*unreadedUrls, params.url)
+			return
+		}
+		fmt.Println(*params)
 		offer := Offer{link, *params, *features}
 		*offers = append(*offers, offer)
 	} else {

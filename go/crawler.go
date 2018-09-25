@@ -43,6 +43,9 @@ func visitOffers(links []string, offers *[]Offer) {
 	var unReadedUrls []string
 	miniBatchSize := 100
 	for i := 0; i < len(links); i += miniBatchSize {
+		if len(links) <= i + miniBatchSize {
+			miniBatchSize = len(links) - i
+		}
 		miniBatchLinks := links[i:i+miniBatchSize]
 		var wg = sync.WaitGroup{}
 		wg.Add(len(miniBatchLinks))
@@ -51,28 +54,21 @@ func visitOffers(links []string, offers *[]Offer) {
 		}
 		wg.Wait()
 	}
+	//var wg = sync.WaitGroup{}
+	//wg.Add(len(links))
+	//for _, link := range links {
+	//	go visitOffer(link, offers, &unReadedUrls, &wg)
+	//}
+	//wg.Wait()
 
 	// -------------------------------------
 	// Used for crawl through the offers with no collected parameters.
 	// Probably possible to remove, the problem with lack of these parameters
 	// is related to otomoto itself (Access denied)
 	// -------------------------------------
-	fmt.Println("[INFO] PUSHING UNREADED LINKS ONCE AGAIN")
 	for _, link := range unReadedUrls {
 		visitOffer(link, offers, &unReadedUrls, nil)
 	}
-}
-
-// -------------------------------------
-// Remove any empty links inside array
-// -------------------------------------
-func removeEmptyLinks(allLinks []string) (links []string) {
-	for _, link := range allLinks {
-		if link != "" {
-			links = append(links, link)
-		}
-	}
-	return links
 }
 
 // -------------------------------------
