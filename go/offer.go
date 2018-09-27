@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strings"
-	"sync"
 	time2 "time"
 )
 
@@ -257,10 +256,10 @@ func readOffer(url string) (*Params, *Features) {
 	return &params, &features
 }
 
-func visitOffer(link string, offers *[]Offer, unreadedUrls *[]string, wg *sync.WaitGroup) {
-	if wg != nil {
-		defer wg.Done()
-	}
+func visitOffer(link string, offers *[]Offer, unreadedUrls *[]string) {
+	//if wg != nil {
+	//	defer wg.Done()
+	//}
 	if link != "" {
 		params, features := readOffer(link)
 		if params.model == "" || params.model == `NULL` {

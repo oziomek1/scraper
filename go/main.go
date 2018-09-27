@@ -5,6 +5,13 @@ import (
 	"golang.org/x/net/html"
 	time2 "time"
 	"runtime"
+	"runtime/debug"
+	"os"
+	"runtime/pprof"
+	_ "net/http/pprof"
+	_ "net/http"
+	"net/http"
+	"log"
 )
 
 // -------------------------------------
@@ -108,8 +115,16 @@ func main() {
 	var allLinks []string
 
 	make, model := "volkswagen/", "golf/"
-	completeUrl := BASE_URL + passenger + make + model
+	completeUrl := BASE_URL + passenger + make + model + QUERY_MARK + QUERY_START + power_from + "130"
 	fmt.Println("\t\tStarting page url: ", completeUrl, "\n\n")
+
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
+
+	debug.PrintStack()
+
+	pprof.Lookup("goroutine").WriteTo(os.Stdout, 1)
 
 	tagForLink := "data-href"
 	urlLinkCrawl(tagForLink, completeUrl, &pageData, &offers, &allLinks, 0)
@@ -118,7 +133,7 @@ func main() {
 
 	fmt.Println("number of offers:", len(offers))
 
-	exportData(offers, "otomotoVWGolf")
+	exportData(offers, "otomotoVWGolf4")
 
 	fmt.Println(time2.Since(start))
 
