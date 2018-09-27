@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"golang.org/x/net/html"
-	"sync"
 )
 
 // -------------------------------------
@@ -41,24 +40,29 @@ func getAndShowNextPageUrl(page *html.Node) (nextPageUrl string) {
 // -------------------------------------
 func visitOffers(links []string, offers *[]Offer) {
 	var unReadedUrls []string
-	miniBatchSize := 100
-	for i := 0; i < len(links); i += miniBatchSize {
-		if len(links) <= i + miniBatchSize {
-			miniBatchSize = len(links) - i
-		}
-		miniBatchLinks := links[i:i+miniBatchSize]
-		var wg = sync.WaitGroup{}
-		wg.Add(len(miniBatchLinks))
-		for _, link := range miniBatchLinks {
-			go visitOffer(link, offers, &unReadedUrls, &wg)
-		}
-		wg.Wait()
-	}
+	//miniBatchSize := 100
+	//for i := 0; i < len(links); i += miniBatchSize {
+	//	if len(links) <= i + miniBatchSize {
+ 	//		miniBatchSize = len(links) - i
+	//	}
+	//	miniBatchLinks := links[i:i+miniBatchSize]
+	//	var wg = sync.WaitGroup{}
+	//	wg.Add(len(miniBatchLinks))
+	//	for _, link := range miniBatchLinks {
+	//		go visitOffer(link, offers, &unReadedUrls, &wg)
+	//	}
+	//	wg.Wait()
+	//}
 	//var wg = sync.WaitGroup{}
 	//wg.Add(len(links))
-	//for _, link := range links {
-	//	go visitOffer(link, offers, &unReadedUrls, &wg)
-	//}
+	limit := NewConcurrencyLimiter(32)
+	for _, link := range links {
+		limit.Execute(func() {
+			visitOffer(link, offers, &unReadedUrls)
+		})
+		//go visitOffer(link, offers, &unReadedUrls, &wg)
+	}
+	limit.Wait()
 	//wg.Wait()
 
 	// -------------------------------------
@@ -67,7 +71,7 @@ func visitOffers(links []string, offers *[]Offer) {
 	// is related to otomoto itself (Access denied)
 	// -------------------------------------
 	for _, link := range unReadedUrls {
-		visitOffer(link, offers, &unReadedUrls, nil)
+		visitOffer(link, offers, &unReadedUrls)
 	}
 }
 
