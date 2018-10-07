@@ -57,9 +57,9 @@ func visitOffers(links []string, offers *[]Offer) {
 	//wg.Add(len(links))
 	limit := NewConcurrencyLimiter(32)
 	for _, link := range links {
-		limit.Execute(func() {
-			visitOffer(link, offers, &unReadedUrls)
-		})
+		//limit.Execute(func() {
+		visitOffer(link, offers, &unReadedUrls)
+		//})
 		//go visitOffer(link, offers, &unReadedUrls, &wg)
 	}
 	limit.Wait()
